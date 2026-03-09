@@ -2,6 +2,9 @@ open Parser_plaf.Ast
 open Parser_plaf.Parser
 open Ds
 
+(* Rachel Naomi Quedding
+I pledge my honor that I have abided by the Stevens Honor System. *)
+
 (** notes to survive the assignment
 >>= operator, binding operator
 evaluate expression, store result in this variable, and continue computation
@@ -99,11 +102,51 @@ let rec eval_expr : expr -> exp_val ea_result =
     (* creates a record with n fields. Field i is assigned the
     expressed value resulting from evaluating expression ei. Reports an error if there are
     duplicate fields. *)
-  | Record(fs) -> failwith "Implement me!"
+  | Record(fs) ->
+    (* extracting fields to check for dupes later *)
+    let fields = List.map fst fs in (* List.map, first param, all fields*)
+
+    (* getting the unique list of names *)
+    let uniqlo = 
+      (* we have an accumulator, and then our f fields, using list.mem to check if f is already in the list, and if it is, append it to the list with :: *)
+      (* https://courses.cs.cornell.edu/cs3110/2021sp/textbook/hop/fold_left.html *)
+      List.fold_left (fun acc f -> if List.mem f acc then acc else f :: acc) [] fields
+    in
+
+    if List.length fields = List.length uniqlo then
+      (* no dupoes, yaay*)
+      (*time to process the fields and make the records*)
+
+      let rec mkrec l =
+        match l with
+        | [] -> return []
+        | (name, (bflag, expr)) :: tail ->
+          eval_expr expr >>= fun v ->
+          mkrec tail >>= fun rest ->
+            return ((name, (bflag, v)) :: rest)
+      in
+    
+      mkrec fs >>= fun recs -> return (RecordVal recs)
+
+
+    else
+      (*eviol dupes, error*)
+      error "Record: duplicate fields"
+
+    (* the checker (for dupes), just by checking length i guess*)
+
 
     (* e.id projects field id from the record resulting from evaluating e. Reports an error if
        e does not evaluate to a record or does not have a field named id *)
-  | Proj(e, id) -> failwith "Implement me!"
+  | Proj(e, id) ->
+    eval_expr e >>= record_of_recordVal >>= fun r -> (* check if record is fr*)
+    try
+      (* https://courses.cs.cornell.edu/cs3110/2021sp/textbook/data/assoc_list.html *)
+      let (_,v) = List.assoc id r in
+      return v
+    with Not_found ->
+      error "Proj: field does not exist"
+  
   
   and
   eval_exprs : expr list -> ( exp_val list ) ea_result =

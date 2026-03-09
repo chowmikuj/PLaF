@@ -1,3 +1,6 @@
+(* Rachel Naomi Quedding
+I pledge my honor that I have abided by the Stevens Honor System. *)
+
 (* This file defines expressed values and environments *)
 
 (* expressed values and environments are defined mutually recursively *)
@@ -10,8 +13,8 @@ type exp_val =
   | PairVal of exp_val*exp_val
   | TupleVal of exp_val list (* stub originally said TupleVal, and ListVal is on the PDF, but i'll leave this as is now *)
   | TreeVal of exp_val tree
-  | Record of (string*(bool*expr)) list
-  | Proj of expr*string
+  | RecordVal of (string*(bool*exp_val)) list
+  | Proj of exp_val*string
 
 type env =
   | EmptyEnv
@@ -115,6 +118,10 @@ let pair_of_pairVal : exp_val -> (exp_val*exp_val) ea_result =  function
 let tree_of_treeVal : exp_val -> (exp_val tree) ea_result =  function
   | TreeVal(t) -> return t
   | _ -> error "Expected a tree!"
+
+let record_of_recordVal : exp_val -> (string*(bool*exp_val)) list ea_result = function
+  |  RecordVal(l) -> return l
+  | _ -> error "Expected a record!"
            
 let rec string_of_expval = function
   | NumVal n -> "NumVal " ^ string_of_int n
