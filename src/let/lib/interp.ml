@@ -95,6 +95,25 @@ let rec eval_expr : expr -> exp_val ea_result =
         extend_env id3 (TreeVal r) >>+
         eval_expr e3 
       )
+    
+    (* creates a record with n fields. Field i is assigned the
+    expressed value resulting from evaluating expression ei. Reports an error if there are
+    duplicate fields. *)
+  | Record(fs) -> failwith "Implement me!"
+
+    (* e.id projects field id from the record resulting from evaluating e. Reports an error if
+       e does not evaluate to a record or does not have a field named id *)
+  | Proj(e, id) -> failwith "Implement me!"
+  
+  and
+  eval_exprs : expr list -> ( exp_val list ) ea_result =
+  fun es ->
+  match es with
+  | [] -> return []
+  | h :: t -> eval_expr h >>= fun i ->
+  eval_exprs t >>= fun l ->
+  return ( i :: l )
+
   | _ -> failwith "Not implemented yet!"
 
 (** [eval_prog e] evaluates program [e] *)

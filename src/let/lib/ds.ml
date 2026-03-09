@@ -10,6 +10,8 @@ type exp_val =
   | PairVal of exp_val*exp_val
   | TupleVal of exp_val list (* stub originally said TupleVal, and ListVal is on the PDF, but i'll leave this as is now *)
   | TreeVal of exp_val tree
+  | Record of (string*(bool*expr)) list
+  | Proj of expr*string
 
 type env =
   | EmptyEnv
