@@ -7,13 +7,16 @@ type exp_val =
   | NumVal of int
   | BoolVal of bool
   | PairVal of exp_val*exp_val
-  | TupleVal of exp_val list
+  | TupleVal of exp_val list (* stub originally said TupleVal, and ListVal is on the PDF, but i'll leave this as is now *)
+  | TreeVal of exp_val tree
+
 type env =
   | EmptyEnv
   | ExtendEnv of string*exp_val*env
 
-
 (* Environment Abstracted Result *)
+
+type 'a tree = Empty | Node of 'a * 'a tree * 'a tree
 
 type 'a result = Ok of 'a | Error of string
 
@@ -107,6 +110,10 @@ let list_of_tupleVal : exp_val -> (exp_val list)  ea_result =  function
 let pair_of_pairVal : exp_val -> (exp_val*exp_val) ea_result =  function
   |  PairVal(ev1,ev2) -> return (ev1,ev2)
   | _ -> error "Expected a pair!"
+
+let tree_of_treeVal : exp_val -> (exp_val tree) ea_result =  function
+  | TreeVal t -> return t
+  | _ -> error "Expected a tree!"
            
 let rec string_of_expval = function
   | NumVal n -> "NumVal " ^ string_of_int n

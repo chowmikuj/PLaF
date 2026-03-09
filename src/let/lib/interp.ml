@@ -1,6 +1,11 @@
 open Parser_plaf.Ast
 open Parser_plaf.Parser
 open Ds
+
+(** notes to survive the assignment
+>>= operator, binding operator
+evaluate expression, store result in this variable, and continue computation
+*)
     
 (** [eval_expr e] evaluates expression [e] *)
 let rec eval_expr : expr -> exp_val ea_result =
@@ -54,6 +59,26 @@ let rec eval_expr : expr -> exp_val ea_result =
     string_of_env >>= fun str ->
     print_endline str; 
     error "Debug called"
+  
+    (* creates an empty tree *)
+  | IsEmpty (e) -> 
+    eval_expr e >>=
+    tree_of_treeVal >>= (* checks if the value we got is a tree *)
+    fun t -> (* if it is a tree, then we start pattern matching*)
+      match t with
+      | Empty -> return (BoolVal true)
+      | Node(_, _, _) -> return (BoolVal false)
+
+    (* returns a boolean indicating whether the e is an empty binary tree (should return an error if e does not evaluate to binary tree) *)
+  | EmptyTree (_t) -> return (TreeVal(Empty))
+
+    (* creates a new tree with data e1, and subtrees e2 and e3 *)
+  | Node(e1, e2, e3) -> 
+    eval_expr e1 >>= fun n -> (* e1 -> node, our node data *)
+    eval_expr e2 >>= fun l -> (* e2 -> left subtree*)
+  
+    (* match, but with trees *)
+  | CaseT (e1, e2, id1, id2, id3, e3) -> failwith "Implement me!"
   | _ -> failwith "Not implemented yet!"
 
 (** [eval_prog e] evaluates program [e] *)
