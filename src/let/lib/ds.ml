@@ -2,6 +2,7 @@
 
 (* expressed values and environments are defined mutually recursively *)
 
+type 'a tree = Empty | Node of 'a * 'a tree * 'a tree
 
 type exp_val =
   | NumVal of int
@@ -15,8 +16,6 @@ type env =
   | ExtendEnv of string*exp_val*env
 
 (* Environment Abstracted Result *)
-
-type 'a tree = Empty | Node of 'a * 'a tree * 'a tree
 
 type 'a result = Ok of 'a | Error of string
 
@@ -112,7 +111,7 @@ let pair_of_pairVal : exp_val -> (exp_val*exp_val) ea_result =  function
   | _ -> error "Expected a pair!"
 
 let tree_of_treeVal : exp_val -> (exp_val tree) ea_result =  function
-  | TreeVal t -> return t
+  | TreeVal(t) -> return t
   | _ -> error "Expected a tree!"
            
 let rec string_of_expval = function
