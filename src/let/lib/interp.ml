@@ -67,8 +67,9 @@ let rec eval_expr : expr -> exp_val ea_result =
     fun t -> (* if it is a tree, then we start pattern matching*)
       (match t with
       | Empty -> return (BoolVal true)
-      | Node(_, _, _) -> return (BoolVal false))
-      
+      | Node(_, _, _) -> return (BoolVal false)
+      )
+
     (* returns a boolean indicating whether the e is an empty binary tree (should return an error if e does not evaluate to binary tree) *)
   | EmptyTree (_t) -> return (TreeVal(Empty))
 
@@ -79,8 +80,21 @@ let rec eval_expr : expr -> exp_val ea_result =
     eval_expr e3 >>= tree_of_treeVal >>= fun r -> (* e3 -> right subtree*)
     return (TreeVal (Node(n, l, r)))
   
-    (* match, but with trees *)
-  | CaseT (e1, e2, id1, id2, id3, e3) -> failwith "Implement me!"
+    (* match, but with trees, from my understanding
+    e1, which is supposed to be a tree
+    if its empty, return e2,
+    if its a node(id1, id2, id3), return e3*)
+  | CaseT (e1, e2, id1, id2, id3, e3) -> 
+    eval_expr e1 >>= tree_of_treeVal >>= fun t -> (* checking if e1 is a tree *)
+      (match t with
+      | Empty -> eval_expr e2
+      | Node(n, l, r) ->
+        (* basically, extending the environment and then evaluating e3 *)
+        extend_env id1 n >>+
+        extend_env id2 (TreeVal l) >>+
+        extend_env id3 (TreeVal r) >>+
+        eval_expr e3 
+      )
   | _ -> failwith "Not implemented yet!"
 
 (** [eval_prog e] evaluates program [e] *)
